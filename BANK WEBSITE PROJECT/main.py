@@ -6,6 +6,7 @@ from flask_jwt_extended import set_access_cookies
 from flask_jwt_extended import unset_jwt_cookies
 from datetime import datetime, timedelta
 import mysql.connector
+import hashlib
 import json
 
 app = Flask(__name__)
@@ -31,6 +32,10 @@ users = {
         'username': 'user2',
         'password': 'password2',
         'email' : 'email'
+    },
+    'user3': {
+        'ac_no':'user3',
+        'pin':'user3'
     }
 }
 JWT_SECRET_KEY = 'hsa784hf4abvhj94ty7jcavhk'
@@ -118,20 +123,24 @@ def about():
     return render_template('about.html')
 
 
-
-@app.route("/service", methods=['GET','POST'])
-@jwt_required()
-def services():
-    
+@app.route("/ac_page", methods=['GET', 'POST'])
+def ac_page():
     if request.method == 'POST':
-        email = request.form.get('email')
-        mycursor = db.cursor(dictionary=True)
-        mycursor.execute('INSERT INTO `subscribe`(`email`,`srno`) VALUES ("'+email+'","null")')
-        db.commit()
-        users[email] = {'email':email}
-        return render_template('service.html')
-    return render_template('service.html')
+        ac_no = request.form.get('ac_no')
+        pin = request.form.get('pin')
 
+        try:
+            with db.cursor(dictionary=True) as mycursor:
+                mycursor.execute('INSERT INTO `accounts`(`ac_no`,`pin`,`srno`) VALUES (%s, %s, "null")', (ac_no, pin))
+                db.commit()
+
+            return render_template('ac_page.html')
+
+        except Exception as e:
+            print(f"Error: {e}")
+            db.rollback()
+
+    return render_template('ac_page.html')
 
 
 @app.route("/contact", methods = ['GET','POST'])
@@ -192,21 +201,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/ac_no", methods = ['GET','POST'])
-def create_ac_no():
-    ac_no = request.form.get('ac_no')
-    pin = request.form.get('pin')
 
-    mycursor = db.cursor(dictionary=True)
-    mycursor.execute('INSERT INTO `accounts` (`ac_no`,`pin`,`srno`) VALUES ("'+ac_no+'","'+pin+'","null")')
-    db.commit()
-
-    if ac_no in users:
-            return "User already exists! Please choose a different account number."
-    else:
-            users[ac_no] = {'ac_no':ac_no, 'pin':pin}
-            return render_template('ac_no.html')
-    
 
 if __name__ == "__main__":
     app.run(debug=True)
