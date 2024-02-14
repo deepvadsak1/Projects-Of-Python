@@ -49,7 +49,7 @@ def main_page():
 # @jwt.invalid_token_loader           
 @app.route("/logout", methods=["POST",'GET'])
 def logout_with_cookies():
-    response = redirect(url_for('ac_page'))
+    response = redirect(url_for('main_page'))
     unset_jwt_cookies(response)
     return response
 
@@ -192,7 +192,7 @@ def index():
     return render_template('index.html')
 
 
-@app.route("/acno", methods = ['GET','POST'])
+@app.route("/ac_no", methods = ['GET','POST'])
 def create_ac_no():
     ac_no = request.form.get('ac_no')
     pin = request.form.get('pin')
@@ -205,7 +205,7 @@ def create_ac_no():
             return "User already exists! Please choose a different account number."
     else:
             users[ac_no] = {'ac_no':ac_no, 'pin':pin}
-            return render_template('contact.html')
+            return render_template('ac_no.html')
     
 
 if __name__ == "__main__":
