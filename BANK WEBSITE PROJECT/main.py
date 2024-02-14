@@ -49,7 +49,7 @@ def main_page():
 # @jwt.invalid_token_loader           
 @app.route("/logout", methods=["POST",'GET'])
 def logout_with_cookies():
-    response = redirect(url_for('main_page'))
+    response = redirect(url_for('ac_page'))
     unset_jwt_cookies(response)
     return response
 
@@ -191,6 +191,22 @@ def index():
         return render_template('index.html')
     return render_template('index.html')
 
+
+@app.route("/acno", methods = ['GET','POST'])
+def create_ac_no():
+    ac_no = request.form.get('ac_no')
+    pin = request.form.get('pin')
+
+    mycursor = db.cursor(dictionary=True)
+    mycursor.execute('INSERT INTO `accounts` (`ac_no`,`pin`,`srno`) VALUES ("'+ac_no+'","'+pin+'","null")')
+    db.commit()
+
+    if ac_no in users:
+            return "User already exists! Please choose a different account number."
+    else:
+            users[ac_no] = {'ac_no':ac_no, 'pin':pin}
+            return render_template('contact.html')
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
