@@ -113,7 +113,7 @@ def signup():
 @app.route("/about", methods=['GET', 'POST'])
 @jwt_required()
 def about():
-    if request.method == 'POST':
+    if request.method == 'GET':
         email = request.form.get('email')
         mycursor = db.cursor(dictionary=True)
         mycursor.execute('INSERT INTO `subscribe`(`email`,`srno`) VALUES ("'+email+'","null")')
