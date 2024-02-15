@@ -123,22 +123,22 @@ def about():
     return render_template('about.html')
 
 
+
 @app.route("/ac_page", methods=['GET', 'POST'])
 def ac_page():
     if request.method == 'POST':
+        name = request.form.get('name')
+        aadharno = request.form.get('aadharno')
+        email  = request.form.get('email')
         ac_no = request.form.get('ac_no')
         pin = request.form.get('pin')
+        
+        mycursor = db.cursor(dictionary=True)
+        mycursor.execute('INSERT INTO `accounts`(`name`,`aadharno`,`email`,`ac_no`,`pin`) VALUES (%s,%s,%s,%s,%s)', (name,aadharno,email,ac_no,pin))
+        db.commit()
 
-        try:
-            with db.cursor(dictionary=True) as mycursor:
-                mycursor.execute('INSERT INTO `accounts`(`ac_no`,`pin`,`srno`) VALUES (%s, %s, "null")', (ac_no, pin))
-                db.commit()
 
-            return render_template('ac_page.html')
-
-        except Exception as e:
-            print(f"Error: {e}")
-            db.rollback()
+        return render_template('index.html')
 
     return render_template('ac_page.html')
 
